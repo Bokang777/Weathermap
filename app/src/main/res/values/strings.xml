@@ -1,0 +1,4 @@
+<resources>
+    <string name= "google_maps_api_key">AIzaSyB5G0rT2j7uipbpziTaVlfnmJYz7XPtn8M</string>
+    <string name="app_name">WeatherMap</string>
+</resources>
