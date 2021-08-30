@@ -15,7 +15,7 @@ public class Weather_activity extends AppCompatActivity {
     private TextView cityText = (TextView) findViewById(R.id.cityText);
     private TextView temp = (TextView) findViewById(R.id.temp);
     private TextView unitTemp = (TextView) findViewById(R.id.unittemp);
-    //private  unitTemp.setText("C");
+    //unitTemp.setText("C");
     private TextView condDescr = (TextView) findViewById(R.id.skydesc);
     private ViewPager pager = (ViewPager) findViewById(R.id.pager);
     private ImageView imgView = (ImageView) findViewById(R.id.condIcon);
