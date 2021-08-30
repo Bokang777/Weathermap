@@ -2,9 +2,17 @@ package com.example.weathermap;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +35,17 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -47,48 +60,36 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if (mLocationPermissionGranted){
             getDeviceLocation();
+            jsonParse();
+            init();
+
             gMap.setMyLocationEnabled(true);
-            gMap.getUiSettings().setMyLocationButtonEnabled(true);
+            gMap.getUiSettings().setMyLocationButtonEnabled(false);
             gMap.setContentDescription("Temp = 2");
             gMap.setBuildingsEnabled(true);
             gMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(@NonNull LatLng latLng) {
                 Toast.makeText(MapActivity.this, "Weather Info",Toast.LENGTH_LONG).show();
+                String seachString = mSearchText.getText().toString();
+                Geocoder geocoder = new Geocoder(MapActivity.this);
+                List<Address> list = new ArrayList<>();
+                try {
+                    list = geocoder.getFromLocationName(seachString, 1);
 
-                String url = "api.openweathermap.org/data/2.5/forecast/daily?lat="+ latLng.latitude +"&lon"+ latLng.longitude
-                        + "&cnt=1&appid=2e29188ca139841dc42c071c3973e714";
-                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    JSONArray jsonArray = response.getJSONArray("temp");
-                                    for (int i = 0; i < jsonArray.length(); i++){
-                                        JSONObject  temps = jsonArray.getJSONObject(i);
+                }catch (IOException e){
+                    Log.d(TAG, "geoLocate: IOException "+ e.getMessage());
 
-                                        double daY = temps.getDouble("day");
-                                        double miN = temps.getDouble("min");
-                                        double maX = temps.getDouble("max");
-                                        double nighT = temps.getDouble("night");
-                                        double evE = temps.getDouble("eve");
-                                        double morN = temps.getDouble("morn");
-                                        //Toast.makeText(MapActivity.this,""+daY+"\n",Toast.LENGTH_LONG).show();
+                }
+                if (list.size()>0) {
+                    Address address = list.get(0);
 
-
-                                    };
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                });
-                mQueue.add(request);
+                    Log.d(TAG, "geoLocate: Found location " + address.toString());
+                    //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+                    moveCamera(new LatLng(address.getLatitude(), address.getLongitude()),
+                            DEFAULT_ZOOM, "Lat " + address.getLatitude() + "\n" +
+                                    "Long " + address.getLongitude());
+                }
             }
 
 
@@ -110,6 +111,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 15;
 
+    //widgets
+    private EditText mSearchText;
+    private ImageView mGps;
+    private ImageView mInfo;
     //vars
     private Boolean mLocationPermissionGranted = false;
     private GoogleMap gMap;
@@ -121,6 +126,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        mSearchText = (EditText) findViewById(R.id.input_search);
+        mGps = (ImageView) findViewById(R.id.ic_gps);
+        mInfo = (ImageView) findViewById(R.id.ic_info);
 
         getLocationPermission();
         getDeviceLocation();
@@ -129,11 +137,72 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    private void jsonParse(LatLng latLng){
+    private void init(){
+        Log.d(TAG, "init: Initializing");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId ==EditorInfo.IME_ACTION_DONE
+                        || event.getAction() == event.ACTION_DOWN
+                        || event.getAction() == event.KEYCODE_ENTER){
+
+                    //execute our method for searching
+                    geoLocate();
+
+                }return false;
+            }
+        });
+        mInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: On info widget click");
+                jsonParse();
+                Log.d(TAG, "onClick: On info widget click success");
+
+            }
+        });
+
+        mGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: Click GPS icon to Reset Position");
+                getDeviceLocation();
+            }
+        });
+        hideSoftKeyboard();
+    }
+    private void geoLocate(){
+        Log.d(TAG, "geoLocate: Geolocating");
+        String seachString = mSearchText.getText().toString();
+        Geocoder geocoder = new Geocoder(MapActivity.this);
+        List<Address> list = new ArrayList<>();
+        try {
+            list = geocoder.getFromLocationName(seachString, 1);
+
+        }catch (IOException e){
+            Log.d(TAG, "geoLocate: IOException "+ e.getMessage());
+
+        }
+        if (list.size()>0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: Found location " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()),
+                    DEFAULT_ZOOM, "Latitude" + address.getLatitude()+"\n"+
+                            "Longitude " + address.getLongitude());
+
+        }
+
+        hideSoftKeyboard();
+    }
+
+    private void jsonParse(){
         //Parse API (JSON FORMAT)
 
-        String url = "api.openweathermap.org/data/2.5/forecast/daily?lat="+ latLng.latitude +"&lon"+ latLng.longitude
-                + "&cnt="+1+"&appid=2e29188ca139841dc42c071c3973e714";
+        String url = "api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=2e29188ca139841dc42c071c3973e714";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -149,8 +218,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 double nighT = temps.getDouble("night");
                                 double evE = temps.getDouble("eve");
                                 double morN = temps.getDouble("morn");
-                                Toast.makeText(MapActivity.this,  daY +"\n"+  miN +"\n"
-                                                +  maX +"\n"+ nighT +"\n"+  evE +"\n"+  morN
+                                //Toast Message Upon Success
+                                Toast.makeText(MapActivity.this,  daY+""
                                         ,Toast.LENGTH_LONG).show();
 
                             };
@@ -183,7 +252,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: Found Location");
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                    DEFAULT_ZOOM, currentLocation.toString());
 
                         }else {
                             Log.d(TAG, "onComplete: Current Location is NULL");
@@ -197,10 +266,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
     }
-    private void moveCamera(LatLng latLng, float zoom){
+    
+    
+    private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera: Moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title(title);
+            gMap.addMarker((options));
+
+        hideSoftKeyboard();
     }
+
 
     //Initialize Google Maps
     private void initMap(){
@@ -257,6 +336,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         }
 
-    
+    private void hideSoftKeyboard(){
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
 }
 

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+    tools:context=".MainActivity"
+    android:orientation="vertical" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        tools:context=".Weather_activity"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/cityText"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#990000"
+            android:layout_alignParentLeft="true">
+        </TextView>
+
+        <TextView
+            android:id="@+id/temp"
+            style="@style/AppTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cityText"
+            android:textColor="#000000"
+            android:textSize="130sp"
+            android:layout_centerHorizontal="true">
+        </TextView>
+        <TextView
+            android:id="@+id/unittemp"
+            android:layout_width="wrap_content"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cityText"
+            android:layout_toRightOf="@id/temp"
+            android:layout_alignBaseline="@id/temp">
+        </TextView>
+        <TextView
+            android:id="@+id/skydesc"
+            android:layout_width="wrap_content"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temp"
+            android:layout_alignStart="@id/temp"
+            android:layout_toRightOf="@id/temp"
+            android:layout_alignLeft="@id/temp">
+        </TextView>
+
+        <!-- Image weather condition -->
+        <ImageView android:id="@+id/condIcon"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_alignTop="@id/temp"
+            android:layout_toRightOf="@id/temp"/>
+    </RelativeLayout>
+    <android.support.v4.view.ViewPager
+
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="6" >
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#000000"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:textColor="#fff" />
+
+    </android.support.v4.view.ViewPager>
+</LinearLayout>

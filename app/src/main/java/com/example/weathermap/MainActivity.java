@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if(isServicesOK()){
-            initB();}
+            initB();
+            initB2();
+        }
     }
 
     private void initB(){
@@ -35,6 +37,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    private void initB2(){
+        Button btnMap2 = (Button) findViewById(R.id.btnWeather);
+        btnMap2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Weather_activity.class);
                 startActivity(intent);
             }
         });
@@ -56,9 +70,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "isServicesOK: an error occurred but we can fix it");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
             dialog.show();
+            Toast.makeText(MainActivity.this,"Fixing Things", Toast.LENGTH_SHORT).show();
             }
         else {
             Toast.makeText(this, "Your device can't make map requests", Toast.LENGTH_SHORT).show();
+                return true; //Check this!!
+
         }
         return false;
 
