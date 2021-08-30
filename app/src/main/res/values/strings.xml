@@ -1,4 +1,10 @@
 <resources>
     <string name= "google_maps_api_key">AIzaSyB5G0rT2j7uipbpziTaVlfnmJYz7XPtn8M</string>
     <string name="app_name">WeatherMap</string>
+    <string name="todo_me">TODO me</string>
+    <string name="map">Map</string>
+    <string name="weather_details">Weather Details</string>
+    <string name="search_weather_by_country_city_or_zip_code">Search Weather By Country, City or ZIP Code</string>
+    <string name="todo">TODO</string>
+    <string name="Home">Home</string>
 </resources>

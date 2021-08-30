@@ -49,7 +49,7 @@ import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private TextView mTextViewResult;
+
     private RequestQueue mQueue;
 
     @Override
@@ -87,7 +87,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Log.d(TAG, "geoLocate: Found location " + address.toString());
                     //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
                     moveCamera(new LatLng(address.getLatitude(), address.getLongitude()),
-                            DEFAULT_ZOOM, "Lat " + address.getLatitude() + "\n" +
+                            "Lat " + address.getLatitude() + "\n" +
                                     "Long " + address.getLongitude());
                 }
             }
@@ -118,7 +118,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //vars
     private Boolean mLocationPermissionGranted = false;
     private GoogleMap gMap;
-    private FusedLocationProviderClient  mFusedLocationProviderClient;
 
 
     @Override
@@ -126,9 +125,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        mSearchText = (EditText) findViewById(R.id.input_search);
-        mGps = (ImageView) findViewById(R.id.ic_gps);
-        mInfo = (ImageView) findViewById(R.id.ic_info);
+        mSearchText = findViewById(R.id.input_search);
+        mGps = findViewById(R.id.ic_gps);
+        mInfo = findViewById(R.id.ic_info);
 
         getLocationPermission();
         getDeviceLocation();
@@ -145,8 +144,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_SEARCH
                         || actionId ==EditorInfo.IME_ACTION_DONE
-                        || event.getAction() == event.ACTION_DOWN
-                        || event.getAction() == event.KEYCODE_ENTER){
+                        || event.getAction() == KeyEvent.ACTION_DOWN
+                        || event.getAction() == KeyEvent.KEYCODE_ENTER){
 
                     //execute our method for searching
                     geoLocate();
@@ -191,7 +190,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.d(TAG, "geoLocate: Found location " + address.toString());
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
             moveCamera(new LatLng(address.getLatitude(),address.getLongitude()),
-                    DEFAULT_ZOOM, "Latitude" + address.getLatitude()+"\n"+
+                    "Latitude" + address.getLatitude()+"\n"+
                             "Longitude " + address.getLongitude());
 
         }
@@ -213,16 +212,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 JSONObject  temps = jsonArray.getJSONObject(i);
 
                                 double daY = temps.getDouble("day");
-                                double miN = temps.getDouble("min");
-                                double maX = temps.getDouble("max");
-                                double nighT = temps.getDouble("night");
-                                double evE = temps.getDouble("eve");
-                                double morN = temps.getDouble("morn");
+                               // double miN = temps.getDouble("min");
+                                //double maX = temps.getDouble("max");
+                                //double nighT = temps.getDouble("night");
+                                //double evE = temps.getDouble("eve");
+                                //double morN = temps.getDouble("morn");
                                 //Toast Message Upon Success
                                 Toast.makeText(MapActivity.this,  daY+""
                                         ,Toast.LENGTH_LONG).show();
 
-                            };
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -240,7 +239,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: Getting Device's Current Location");
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionGranted) {
 
@@ -252,7 +251,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: Found Location");
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM, currentLocation.toString());
+                                    currentLocation.toString());
 
                         }else {
                             Log.d(TAG, "onComplete: Current Location is NULL");
@@ -268,9 +267,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
     
     
-    private void moveCamera(LatLng latLng, float zoom, String title){
+    private void moveCamera(LatLng latLng, String title){
         Log.d(TAG, "moveCamera: Moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, MapActivity.DEFAULT_ZOOM));
 
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
@@ -286,6 +285,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Log.d(TAG, "initMap: Initializing Map");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(MapActivity.this);
     }
 
@@ -317,21 +317,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: called");
         mLocationPermissionGranted = false;
-        switch (requestCode){
-            case LOCATION_PERMISSION_REQUEST_CODE:{
-                if(grantResults.length > 0){
-                    for (int i = 0; i < grantResults.length; i++){
-                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
-                            mLocationPermissionGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult: Permission failed");
-                            return;
-                        }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                for (int grantResult : grantResults) {
+                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                        mLocationPermissionGranted = false;
+                        Log.d(TAG, "onRequestPermissionsResult: Permission failed");
+                        return;
                     }
-                    Log.d(TAG, "onRequestPermissionsResult: Permission granted");
-                    mLocationPermissionGranted = true;
-                    //initialize our map
-                    initMap();
                 }
+                Log.d(TAG, "onRequestPermissionsResult: Permission granted");
+                mLocationPermissionGranted = true;
+                //initialize our map
+                initMap();
             }
         }
         }
