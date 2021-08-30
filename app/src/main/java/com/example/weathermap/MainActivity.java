@@ -25,9 +25,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initB2();
         if(isServicesOK()){
             initB();
-            initB2();
+
         }
     }
 
