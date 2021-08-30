@@ -20,9 +20,16 @@ public class Weather_activity extends AppCompatActivity {
     private ViewPager pager = (ViewPager) findViewById(R.id.pager);
     private ImageView imgView = (ImageView) findViewById(R.id.condIcon);
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_activity);
+
+        //AsyncTask to call URL to get Weather data.
+        //JSONWeatherTask task = new JSONWeatherTask();
+        //task.execute(new String[]{city,lang});
+        //JSONForecastWeatherTask task1 = new JSONForecastWeatherTask();
+        //task1.execute(new String[]{city,lang, forecastDaysNum});
     }
 }
