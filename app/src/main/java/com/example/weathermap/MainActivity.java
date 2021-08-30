@@ -44,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initB2(){
-        Button btnMap2 = (Button) findViewById(R.id.btnWeather);
-        btnMap2.setOnClickListener(new View.OnClickListener() {
+        Button btnWed = (Button) findViewById(R.id.btnWeather);
+        btnWed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Weather_activity.class);
-                startActivity(intent);
+                Intent intent_wed = new Intent(MainActivity.this, Weather_activity.class);
+                startActivity(intent_wed);
             }
         });
 
