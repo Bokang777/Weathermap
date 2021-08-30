@@ -1,7 +1,5 @@
 package com.example.weathermap;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,9 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,7 +24,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initB2();
+
+        Button btnWed = findViewById(R.id.btnWeather);
+        btnWed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWeatherActivity();
+            }
+        });
         if(isServicesOK()){
             initB();
 
@@ -33,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initB(){
-        Button btnMap = (Button) findViewById(R.id.btnMap);
+        Button btnMap = findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,19 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private Button btnWed;
-    private void initB2(){
-        btnWed = (Button) findViewById(R.id.btnWeather);
-        btnWed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openWeatherActivity();
-            }
-        });
-    }
-
     public void openWeatherActivity(){
         Intent intent = new Intent(this, Weather_activity.class);
+        startActivity(intent);
     }
 
 
@@ -73,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             //an error occurred but we can resolve it
             Log.d(TAG, "isServicesOK: an error occurred but we can fix it");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            assert dialog != null;
             dialog.show();
             Toast.makeText(MainActivity.this,"Fixing Things", Toast.LENGTH_SHORT).show();
             }
