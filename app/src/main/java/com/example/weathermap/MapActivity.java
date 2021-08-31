@@ -250,7 +250,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                            double longi = currentLocation.getLongitude();
+                            double lati = currentLocation.getLatitude();
+                            moveCamera(new LatLng(lati, longi),
                                     currentLocation.toString());
 
                         }else {

@@ -15,7 +15,8 @@ public class jsonWeatherParse {
         Weather weather = new Weather();
 
         // We create out JSONObject from the data
-        JSONObject jObj = new JSONObject(data);
+        JSONObject jObj;
+        jObj = new JSONObject(data);
 
         // We start extracting the info
         Location loc = new Location();
