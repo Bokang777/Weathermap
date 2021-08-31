@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    String city = "London, UK";
+    String city = "London,UK";
 
     private TextView cityText;
     private TextView condDescr;
