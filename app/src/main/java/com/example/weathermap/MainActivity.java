@@ -24,6 +24,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button btn2wed = findViewById(R.id.btn2Weather);
+        btn2wed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Weather2Activity.class);
+                startActivity(intent);
+            }
+        });
+
 
         Button btnWed = findViewById(R.id.btnWeather);
         btnWed.setOnClickListener(new View.OnClickListener() {

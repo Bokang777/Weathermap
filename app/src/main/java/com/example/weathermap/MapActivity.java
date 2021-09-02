@@ -250,10 +250,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            double longi = currentLocation.getLongitude();
-                            double lati = currentLocation.getLatitude();
-                            moveCamera(new LatLng(lati, longi),
-                                    currentLocation.toString());
+                            Double longi = currentLocation.getLongitude();
+                            Double lati = currentLocation.getLatitude();
+                            if(longi == null){
+                                return;}
+                            else if(lati == null){
+                                return;}
+                            else{
+                                moveCamera(new LatLng(lati, longi),
+                                    currentLocation.toString());}
 
                         }else {
                             Log.d(TAG, "onComplete: Current Location is NULL");
@@ -294,14 +299,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //Get the required location Permissions
     private void getLocationPermission(){
         Log.d(TAG, "getLocationPermission: Getting location permission ");
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-                               Manifest.permission.ACCESS_COARSE_LOCATION};
+        String[] permissions = new String[0];
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+        ) {
+            permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                                   Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+        }
         if (ContextCompat.checkSelfPermission((this.getApplicationContext()),
                 FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                     COURSE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
-                mLocationPermissionGranted = true;
-                initMap();
+                if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                        COURSE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
+
+                    initMap();}
             }else {
                 ActivityCompat.requestPermissions(this, permissions,
                         LOCATION_PERMISSION_REQUEST_CODE);
